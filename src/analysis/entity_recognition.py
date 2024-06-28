@@ -20,15 +20,21 @@ def entity_recognition(text):
     return entities
 
 def process_all_transcripts():
-    transcripts = [f for f in os.listdir(PREPROCESSED_DIR) if f.endswith(".txt")]
     all_entities = []
 
-    for filename in transcripts:
-        transcript_path = os.path.join(PREPROCESSED_DIR, filename)
-        with open(transcript_path, "r", encoding="utf-8") as f:
-            text = f.read()
-            entities = entity_recognition(text)
-            all_entities.append(f"Entities in {filename}:\n{entities}\n{'-'*80}\n")
+    for root, _, files in os.walk(PREPROCESSED_DIR):
+        for filename in files:
+            if filename.endswith(".txt") and filename != "speaker_names.txt":
+                transcript_path = os.path.join(root, filename)
+                with open(transcript_path, "r", encoding="utf-8") as f:
+                    text = f.read()
+                    entities = entity_recognition(text)
+                    webinar_name = os.path.splitext(os.path.basename(filename))[0]
+                    entity_output = f"Entities in {webinar_name}:\n"
+                    for entity_type, entity_list in entities.items():
+                        entity_output += f"{entity_type}:\n" + "\n".join(entity_list) + "\n"
+                    entity_output += "-"*80 + "\n"
+                    all_entities.append(entity_output)
 
     with open(ENTITY_OUTPUT, "w", encoding="utf-8") as out_f:
         out_f.write("\n".join(all_entities))

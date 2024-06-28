@@ -25,15 +25,17 @@ def sentiment_analysis(text):
     return sentiment_scores
 
 def process_all_transcripts():
-    transcripts = [f for f in os.listdir(PREPROCESSED_DIR) if f.endswith(".txt")]
     all_sentiments = []
 
-    for filename in transcripts:
-        transcript_path = os.path.join(PREPROCESSED_DIR, filename)
-        with open(transcript_path, "r", encoding="utf-8") as f:
-            text = f.read()
-            sentiments = sentiment_analysis(text)
-            all_sentiments.append(f"Sentiments in {filename}:\n{sentiments}\n{'-'*80}\n")
+    for root, _, files in os.walk(PREPROCESSED_DIR):
+        for filename in files:
+            if filename.endswith(".txt") and filename != "speaker_names.txt":
+                transcript_path = os.path.join(root, filename)
+                with open(transcript_path, "r", encoding="utf-8") as f:
+                    text = f.read()
+                    sentiments = sentiment_analysis(text)
+                    webinar_name = os.path.splitext(os.path.basename(filename))[0]
+                    all_sentiments.append(f"Sentiments in {webinar_name}:\n{sentiments}\n{'-'*80}\n")
 
     with open(SENTIMENT_OUTPUT, "w", encoding="utf-8") as out_f:
         out_f.write("\n".join(all_sentiments))
