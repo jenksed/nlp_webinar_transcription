@@ -1,0 +1,12 @@
+spacy
+nltk
+gensim
+transformers
+pandas
+numpy
+scikit-learn
+whisper
+pydub
+pytest
+coverage
+pre-commit
